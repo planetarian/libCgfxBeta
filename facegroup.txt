@@ -1,0 +1,38 @@
+ FaceGroup
+0x00 01000000    1 : count  |           |
+0x04 10000000   16 : offset |           | to 0x14
+0x08 00000000    0 :        |           |
+0x0C 01000000    1 : count  |           |
+0x10 08000000    8 : offset |           | to 0x18
+
+ BoneGroupId array
+ for 0x00
+0x14 00000000    0 :        | from 0x04 | 
+
+ Unknown1 offsets array
+ for 0x0C
+0x18 04000000    4 : offset | from 0x10 | to 0x1C
+
+ Unknown1
+ from 0x0C array
+0x1C 01000000    1 : count  | from 0x18 |
+0x20 14000000   20 : offset |           | to 0x34
+0x24 01000000    1 : count  |           |
+0x28 10000000   16 : offset |           | to 0x38
+0x2C 00000000    0 :        |           |
+0x30 00000000    0 :        |           |
+
+ FaceGroupDescriptor offsets array
+ for 0x1C
+0x34 08000000    8 :        | from 0x20 | to 0x3C
+
+ Unknown3 array
+ for 0x24
+0x38 00000000    0 :        | from 0x28 |
+
+ FaceGroupDescriptor
+ from 0x1C array
+0x3C 01140000 5121 : bytes  | from 0x34 | 01: byte; 03: short
+0x40 00010000  256 :        |           |
+0x44 06000000    6 : count  |           |
+0x48 08050000 1288 : offset |           | to 0x1108

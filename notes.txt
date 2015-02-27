@@ -1,0 +1,29 @@
+CGFX - magic
+FF FE 14 00  0014FEFF
+00 00 00 05  05000000
+00 B0 04 00  0004B000
+02 00 00 00  00000002 entries
+
+             00000014 baseOff
+44 41 54 41  DATA     baseType
+E4 1A 01 00  00011AE4 baseSize
+ baseOff + baseSize = 00011AF8
+ cgfx[0] = { 00000014, DATA, 00011AE4 }
+
+             00011AF8 baseOff
+49 4D 41 47  IMAG     baseType
+08 95 03 00  00039508 baseSize
+ baseOff + baseSize = 0004B000
+ cgfx[0] = { 00011AF8, IMAG, 00039508 }
+
+baseOff    0x0004B000
+EOF
+
+
+DATA
+Size
+x16:
+01 00 00 00  00000001 count
+             00000020 offset
+7C 00 00 00  0000007C size
+             0000009C location
