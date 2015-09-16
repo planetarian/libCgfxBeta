@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text;
 using Microsoft.Xna.Framework;
 
@@ -71,7 +72,7 @@ namespace libCgfx
         }
 
 
-        internal static string DisplayValue<T>(T value) where T : struct,
+        public static string DisplayValue<T>(T value) where T : struct,
             IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
             if (typeof(T) == typeof(float))
@@ -84,14 +85,14 @@ namespace libCgfx
             return value + " (0x" + value.ToString("X", null) + ")";
         }
 
-        internal static string DisplayValue(Vector2 value)
+        public static string DisplayValue(Vector2 value)
         {
             return "(" + value.X + "," + value.Y + ") [" +
                    DisplayValue(value.X) + ", " + DisplayValue(value.Y) +
                    "]";
         }
 
-        internal static string DisplayValue(Vector3 value)
+        public static string DisplayValue(Vector3 value)
         {
             return "(" + value.X + "," + value.Y + "," + value.Z + ") [" +
                    DisplayValue(value.X) + ", " + DisplayValue(value.Y) + ", " + DisplayValue(value.Z) +
@@ -155,8 +156,11 @@ namespace libCgfx
         /// <param name="bytes">Number of bytes to read.</param>
         /// <param name="consume">Whether to advance the current offset.</param>
         /// <returns>Array containing the read bytes.</returns>
-        protected byte[] ReadBytes(int bytes, bool consume = true)
+        protected byte[] ReadBytes(int bytes, bool consume = true, bool cover = true)
         {
+            if (cover)
+                RootObject.Coverage.Add(CurrentOffset, CurrentOffset + bytes - 1);
+
             PreviousOffset = CurrentOffset;
             var buf = new byte[bytes];
             Array.Copy(InputFile, CurrentOffset, buf, 0, bytes);
@@ -169,8 +173,11 @@ namespace libCgfx
         /// </summary>
         /// <param name="consume">Whether to advance the current offset.</param>
         /// <returns>The read Byte.</returns>
-        protected byte ReadByte(bool consume = true)
+        protected byte ReadByte(bool consume = true, bool cover = true)
         {
+            if (cover)
+                RootObject.Coverage.Add(CurrentOffset);
+
             byte result = InputFile[CurrentOffset];
             if (consume) CurrentOffset++;
             return result;
@@ -366,6 +373,8 @@ namespace libCgfx
         /// <exception cref="InvalidDataException">No magic value found.</exception>
         protected string ReadMagic(bool consume = true)
         {
+            RootObject.Coverage.Add(CurrentOffset, CurrentOffset + 3);
+
             var bytes = new byte[4];
             var chars = new char[4];
             for (int i = 0; i < 4; i++)
@@ -400,7 +409,11 @@ namespace libCgfx
                 sb.Append((char) InputFile[CurrentOffset + i]);
             if (consume) CurrentOffset += 4;
             magic = sb.ToString();
-            return magicStrings.Contains(magic);
+
+            bool success = magicStrings.Contains(magic);
+            if (success)
+                RootObject.Coverage.Add(CurrentOffset, CurrentOffset + 3);
+            return success;
         }
 
         /// <summary>
@@ -416,7 +429,7 @@ namespace libCgfx
             }
             else if (bytes > 0)
             {
-                byte[] buf = ReadBytes(bytes); // implicit consume
+                byte[] buf = ReadBytes(bytes, true, false); // implicit consume
                 if (print)
                     Log("- Skipped " + DisplayValue(bytes) + " bytes "
                         + PrintBytesGrouped(buf) + (buf.Length > 16 ? " ..." : ""), 3);
@@ -541,9 +554,13 @@ namespace libCgfx
         /// </summary>
         /// <param name="offset">Offset to start reading from.</param>
         /// <param name="bytes">Number of bytes to read.</param>
+        /// <param name="cover">Whether to record this reading in the coverage data.</param>
         /// <returns>Array containing the read bytes.</returns>
-        protected byte[] ReadBytes(int offset, int bytes)
+        protected byte[] ReadBytes(int offset, int bytes, bool cover = true)
         {
+            if (cover)
+                RootObject.Coverage.Add(offset, offset + bytes - 1);
+
             var buf = new byte[bytes];
             Array.Copy(InputFile, offset, buf, 0, bytes);
             return buf;
@@ -553,9 +570,13 @@ namespace libCgfx
         /// Reads a byte from the specified offset.
         /// </summary>
         /// <param name="offset">Offset to start reading from.</param>
+        /// <param name="cover">Whether to record this reading in the coverage data.</param>
         /// <returns>The read Byte.</returns> 
-        protected byte ReadByte(int offset)
+        protected byte ReadByte(int offset, bool cover = true)
         {
+            if (cover)
+                RootObject.Coverage.Add(offset);
+
             return InputFile[offset];
         }
 
@@ -730,12 +751,14 @@ namespace libCgfx
         protected string ReadStringTerminated(int offset)
         {
             var sb = new StringBuilder();
-            for (int i = 0; i < 100; i++)
+            int i;
+            for (i = 0; i < 100; i++)
             {
                 byte b = InputFile[offset + i];
                 if (b == 0x00) break;
                 sb.Append((char) b);
             }
+            RootObject.Coverage.Add(offset, offset + i);
             return sb.ToString();
         }
 
@@ -747,6 +770,8 @@ namespace libCgfx
         /// <exception cref="InvalidDataException">No magic value found.</exception>
         protected string ReadMagic(int offset)
         {
+            RootObject.Coverage.Add(offset, offset + 3);
+
             var bytes = new byte[4];
             var chars = new char[4];
             for (int i = 0; i < 4; i++)
@@ -779,7 +804,10 @@ namespace libCgfx
             for (int i = 0; i < 4; i++)
                 sb.Append((char)InputFile[offset + i]);
             magic = sb.ToString();
-            return magicStrings.Contains(magic);
+            bool success = magicStrings.Contains(magic);
+            if (success)
+                RootObject.Coverage.Add(offset, offset + 3);
+            return success;
         }
 
         /// <summary>

@@ -25,6 +25,7 @@ namespace libCgfx
         public Model[] Models { get; private set; }
         public Dictionary<string, Texture> Textures { get; private set; }
 
+        public Coverage Coverage { get; set; } = new Coverage();
 
         public Cgfx(string inputFilename, Action<string, int, int> logCallbackAction)
             : base(inputFilename, logCallbackAction)
@@ -180,8 +181,9 @@ namespace libCgfx
                         }
 
                         // Now let's work on building the faces.
-                        var indices = fg.SubFaceGroups.SelectMany(
+                        int[] indices = fg.SubFaceGroups.SelectMany(
                             sfg => sfg.FaceGroupDescriptors.SelectMany(fgd => fgd.Data)).ToArray();
+
                         for (int i = 0; i < indices.Length; i++, total++)
                         {
                             int index = indices[i];
@@ -243,10 +245,13 @@ namespace libCgfx
                                                 byte boneGroupIndex = ReadRawBytes(vg.Data, fvf, ref componentPosition)[0];
                                                 if (fvf.NumComponents > 1) continue;
 
-                                                int boneIndex = fg.BoneGroups[boneGroupIndex];
-                                                Bone bone = cmdl.SkeletonSobj.Bones[boneIndex];
-                                                Matrix boneMatrix2 = bone.GetMatrix();
-                                                vertex.ApplyMatrix(boneMatrix2);
+                                                if (fg.BoneGroups != null)
+                                                {
+                                                    int boneIndex = fg.BoneGroups[boneGroupIndex];
+                                                    Bone bone = cmdl.SkeletonSobj.Bones[boneIndex];
+                                                    Matrix boneMatrix2 = bone.GetMatrix();
+                                                    vertex.ApplyMatrix(boneMatrix2);
+                                                }
                                             }
                                             break;
                                         default:

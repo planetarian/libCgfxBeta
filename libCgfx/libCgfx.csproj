@@ -43,6 +43,8 @@
     <Compile Include="Bone.cs" />
     <Compile Include="Cgfx.cs" />
     <Compile Include="Cmdl.cs" />
+    <Compile Include="Coverage.cs" />
+    <Compile Include="CoverageNode.cs" />
     <Compile Include="Luts.cs" />
     <Compile Include="CtrObject.cs" />
     <Compile Include="Data.cs" />
@@ -72,9 +74,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetFileName)"
-copy /Y "$(TargetDir)$(TargetName).pdb" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetName).pdb"
-"C:\Program Files\Unity 5.0.0b11\Editor\Data\MonoBleedingEdge\lib\mono\4.5\pdb2mdb.exe" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>@echo copy /Y "$(TargetPath)" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetFileName)"
+@echo copy /Y "$(TargetDir)$(TargetName).pdb" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetName).pdb"
+@echo "C:\Program Files\Unity 5.0.0b11\Editor\Data\MonoBleedingEdge\lib\mono\4.5\pdb2mdb.exe" "$(ProjectDir)..\..\Unity\ViewCgfx\Assets\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -84,6 +84,34 @@ namespace ReadCgfxGui.ViewModel
             {
 #endif
                 CgfxObject = new Cgfx(FileName, LogMessage);
+                LogMessage("Total bytes:   " + CgfxObject.FileSize, 0, 0);
+                LogMessage("Covered bytes: " + CgfxObject.Coverage.BytesCovered, 0, 0);
+                int i = 0;
+                int end = -1;
+                var uncovered = new Coverage();
+                foreach (CoverageNode node in CgfxObject.Coverage)
+                {
+                    int start = node.OffsetStart;
+                    if (end >= 0 || start != 0)
+                        uncovered.Add(end + 1, start - 1);
+                    end = node.OffsetEnd;
+                    string startExpanded = CtrObject.DisplayValue(node.OffsetStart);
+                    string endExpanded = CtrObject.DisplayValue(node.OffsetEnd);
+                    LogMessage($"{i++} {startExpanded} - {endExpanded} ({node.Length})", 1, 0);
+                }
+
+                int last = CgfxObject.FileSize - 1;
+                if (end < last)
+                    uncovered.Add(end, last);
+
+                LogMessage("Uncovered bytes: " + uncovered.BytesCovered, 0, 0);
+                foreach (CoverageNode node in uncovered)
+                {
+                    string startExpanded = CtrObject.DisplayValue(node.OffsetStart);
+                    string endExpanded = CtrObject.DisplayValue(node.OffsetEnd);
+                    LogMessage($"{i++} {startExpanded} - {endExpanded} ({node.Length})", 1, 0);
+                }
+
 #if !DEBUG
             }
             catch (Exception ex)
