@@ -209,7 +209,7 @@ namespace libCgfx
                                             if (fg.NumBoneGroups == 1)
                                                 vertex.ApplyMatrix(boneMatrix);
 
-                                            // Converts left-handed mesh vertices to right-handed.
+                                            // TODO: Converts left-handed mesh vertices to right-handed.
                                             // Don't re-enable this until after the entire spec is implemented.
                                             //vertex.Z = -vertex.Z;
                                             break;
@@ -228,7 +228,8 @@ namespace libCgfx
                                             vertex.Nx = ReadValue(vg.Data, fvf, ref componentPosition);
                                             vertex.Ny = ReadValue(vg.Data, fvf, ref componentPosition);
                                             vertex.Nz = ReadValue(vg.Data, fvf, ref componentPosition);
-                                            // Converts left-handed mesh normals to right-handed.
+
+                                            // TODO: Converts left-handed mesh normals to right-handed.
                                             // Don't re-enable this until after the entire spec is implemented.
                                             //vertex.Nz = -vertex.Nz;
                                             break;
