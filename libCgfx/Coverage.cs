@@ -13,6 +13,9 @@ namespace libCgfx
 
         public void Add(int offset)
         {
+            // Simplifies the code, but may not be as efficient?
+            //Add(offset, offset); return;
+
             // If no head yet, or offset is well before it
             if (Head == null || offset < Head.OffsetStart - 1)
             {
